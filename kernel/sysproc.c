@@ -107,3 +107,10 @@ sys_uptime(void)
   release(&tickslock);
   return xticks;
 }
+
+// Return the code of our OS course
+uint64
+sys_getcourseno(void)
+{
+    return 3221;
+}
