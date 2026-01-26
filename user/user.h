@@ -25,6 +25,9 @@ char* sys_sbrk(int,int);
 int pause(int);
 int uptime(void);
 int getcourseno(void);
+// procinfo system call (Project 1)
+int getprocs(struct procinfo *pinfo, int max_procs);
+
 
 // ulib.c
 int stat(const char*, struct stat*);
