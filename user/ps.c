@@ -29,11 +29,21 @@ state_str(int state)
   }
 }
 
-int
-main(void) {
+int main(void) {
 
+    // Declaring variables:
+    struct procinfo infos[NPROC]; // Array to hold info of all possible processes.
+    int n = getprocs(infos, NPROC); // Call to getprocs syscall to fill infos array, returns number of processes.
 
+    if (n < 0) { //If failed, print error and exit.
+        fprintf(2, "ps: getprocs failed \n"); // Print error message if getprocs fails
+        exit(1);
+    }
+
+    // Print header for the output table.
     
-}
 
+
+
+}
 
