@@ -27,6 +27,10 @@ struct cpu {
 };
 
 extern struct cpu cpus[NCPU];
+//Project 1:
+extern struct proc proc[NPROC];
+extern struct spinlock wait_lock;
+
 
 // per-process data for the trap handling code in trampoline.S.
 // sits in a page by itself just under the trampoline page in the
