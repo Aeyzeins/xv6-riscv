@@ -129,6 +129,7 @@ static uint64 (*syscalls[])(void) = {
 [SYS_mkdir]   sys_mkdir,
 [SYS_close]   sys_close,
 [SYS_getcourseno] sys_getcourseno,
+[SYS_getprocs] sys_getprocs,
 };
 
 void
