@@ -5,6 +5,7 @@
 #include "memlayout.h"
 #include "spinlock.h"
 #include "proc.h"
+#include "procinfo.h"
 #include "vm.h"
 
 uint64
@@ -113,4 +114,15 @@ uint64
 sys_getcourseno(void)
 {
     return 3221;
+}
+
+//sys_getprocs: copy process info into user-defined array
+uint64
+sys_getprocs(void){
+
+
+
+
+
+  
 }
