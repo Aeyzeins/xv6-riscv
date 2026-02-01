@@ -16,7 +16,7 @@ Defining state cases, numeric values into readable words
 
 static const char*  //returns pointer to a string literal (read-only)
 
-state_str(int state)
+state_name(int state)
 {
   switch(state){
   case 0: return "UNUSED";
@@ -33,17 +33,25 @@ int main(void) {
 
     // Declaring variables:
     struct procinfo infos[NPROC]; // Array to hold info of all possible processes.
-    int n = getprocs(infos, NPROC); // Call to getprocs syscall to fill infos array, returns number of processes.
+    int count = getprocs(infos, NPROC); // Call to getprocs syscall to fill infos array, returns number of processes.
 
-    if (n < 0) { //If failed, print error and exit.
+    if (count < 0) { //If failed, print error and exit.
         fprintf(2, "ps: getprocs failed \n"); // Print error message if getprocs fails
         exit(1);
     }
 
     // Print header for the output table.
-    
+    printf("PID    PPID   STATE      SIZE       NAME\n");
+      for(int i = 0; i < count; i++){
+    printf("%-6d %-6d %-10s %-10u %s\n",
+           infos[i].pid,
+           infos[i].ppid,
+           state_name(infos[i].state),
+           infos[i].sz,
+           infos[i].name);
+  }
 
-
+  exit(0);
 
 }
 
