@@ -43,3 +43,5 @@ entry("sbrk");
 entry("pause");
 entry("uptime");
 entry("getcourseno");
+#Project 1:    
+entry("getprocs");  
