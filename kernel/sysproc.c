@@ -8,6 +8,10 @@
 #include "procinfo.h"
 #include "vm.h"
 
+extern struct proc proc[NPROC];
+extern struct spinlock wait_lock;
+
+
 uint64
 sys_exit(void)
 {
@@ -174,7 +178,8 @@ sys_getprocs(void)
     }
 
 
-  return count; //return the number of process entries copied into user space
   
   }
+
+  return count; //return the number of process entries copied into user space
 }
