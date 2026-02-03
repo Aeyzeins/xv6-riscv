@@ -14,6 +14,6 @@ struct procinfo {
     uint sz;                    // Size of process memory in bytes
     char name[16];              // Process name
 
-}
+};
 
-#endif 
+#endif //_PROCINFO_H_
