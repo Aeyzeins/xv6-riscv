@@ -55,3 +55,12 @@ int main(void) {
 
 }
 
+
+/*
+
+Without the functions, formatting print out like this:
+
+PID    PPID   STATE      SIZE       NAME
+%-6d %-6d %-10s %-10u q�����������V�Z�^�b�f�j���
+
+*/
