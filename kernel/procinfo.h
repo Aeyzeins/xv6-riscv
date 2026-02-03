@@ -2,6 +2,7 @@
 #ifndef _PROCINFO_H_
 #define _PROCINFO_H_
 
+#include "types.h"
 
 /*
  * Structure to hold process information
