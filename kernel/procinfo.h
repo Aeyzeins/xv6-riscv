@@ -1,5 +1,5 @@
 //1st step of the Project 1: Add the shared struct header so both kernel and user programs can use it
-#ifdef _PROCINFO_H_
+#ifndef _PROCINFO_H_
 #define _PROCINFO_H_
 
 
@@ -14,3 +14,5 @@ struct procinfo {
     char name[16];              // Process name
 
 }
+
+#endif 

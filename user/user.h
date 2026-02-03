@@ -27,7 +27,7 @@ int pause(int);
 int uptime(void);
 int getcourseno(void);
 // procinfo system call (Project 1)
-int getprocs(struct procinfo *pinfo, int max_procs);
+int getprocs(struct procinfo*, int max_procs);
 
 
 // ulib.c
