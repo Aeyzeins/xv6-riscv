@@ -29,6 +29,72 @@ state_name(int state)
   }
 }
 
+/* Without changing printf.c, random charactization from output appears
+ * I decided to make a print functions to help address the problem.
+ */
+
+static int
+uint_digits(uint64 value)
+{
+  int digits = 1;
+
+  while(value >= 10){
+    value /= 10;
+    digits++;
+  }
+  return digits;
+}
+
+static void
+print_padding(int count)
+{
+  for(int i = 0; i < count; i++){
+    printf(" ");
+  }
+}
+
+static void
+print_uint_padded(uint64 value, int width)
+{
+  int digits = uint_digits(value);
+
+  printf("%lu", value);
+  if(width > digits){
+    print_padding(width - digits);
+  }
+}
+
+static void
+print_int_padded(int value, int width)
+{
+  uint64 magnitude = value < 0 ? (uint64)(-value) : (uint64)value;
+  int digits = uint_digits(magnitude) + (value < 0 ? 1 : 0);
+
+  printf("%d", value);
+  if(width > digits){
+    print_padding(width - digits);
+  }
+}
+
+static void
+print_str_padded(const char *value, int width)
+{
+  int length = 0;
+
+  if(value){
+    while(value[length]){
+      length++;
+    }
+  }
+
+  printf("%s", value ? value : "");
+  if(width > length){
+    print_padding(width - length);
+  }
+}
+
+
+
 int main(void) {
 
     // Declaring variables:
@@ -41,6 +107,8 @@ int main(void) {
     }
 
     // Print header for the output table.
+
+    /*
     printf("PID    PPID   STATE      SIZE       NAME\n");
       for(int i = 0; i < count; i++){
     printf("%-6d %-6d %-10s %-10u %s\n",
@@ -49,6 +117,19 @@ int main(void) {
            state_name(infos[i].state),
            infos[i].sz,
            infos[i].name);
+          */
+    print_str_padded("PID", 6);
+    print_str_padded("PPID", 6);
+    print_str_padded("STATE", 10);
+    print_str_padded("SIZE", 10);
+
+    printf("NAME\n");
+    for(int i = 0; i < count; i++){
+      print_int_padded(infos[i].pid, 6);
+      print_int_padded(infos[i].ppid, 6);
+      print_str_padded(state_name(infos[i].state), 10);
+      print_uint_padded(infos[i].sz, 10);
+      printf("%s\n", infos[i].name);
   }
 
   exit(0);
