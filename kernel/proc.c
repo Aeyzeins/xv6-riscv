@@ -702,16 +702,18 @@ sys_getprocs(void)
   struct proc *curproc = myproc();    //current process (caller), used to get its pagetable for copyout()
   int count = 0;                      //number of procinfo structs copied into user space 
   
-  argaddr(0, &uaddr);  //get user buffer address
-  argint(1, &max);     //get 2nd syscall argument, then store it in max
 
-  if (max < 0) {
+  //Validating arguments
+  argaddr(0, &uaddr);
+  argint(1, &max);
+
+  if (max <= 0) {
     return -1; //returns error if the entry count is negative or zero
   }
 
   //Now we are going to loop through every process in the process table
   //and copy its info into the user buffer until we filled max entries.
-  for(p = proc; p < &proc[NPROC]; p++) {
+  for(p = proc; p < &proc[NPROC] && count < max; p++) {
     int has_entry = 0; //flag to indicate if we added an entry for this process
 
     //Lock the process to safely read its state, pid, ppid, sz, and name from procinfo.c
