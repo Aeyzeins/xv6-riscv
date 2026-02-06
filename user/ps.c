@@ -107,17 +107,6 @@ int main(void) {
     }
 
     // Print header for the output table.
-
-    /*
-    printf("PID    PPID   STATE      SIZE       NAME\n");
-      for(int i = 0; i < count; i++){
-    printf("%-6d %-6d %-10s %-10u %s\n",
-           infos[i].pid,
-           infos[i].ppid,
-           state_name(infos[i].state),
-           infos[i].sz,
-           infos[i].name);
-          */
     print_str_padded("PID", 6);
     print_str_padded("PPID", 6);
     print_str_padded("STATE", 10);
