@@ -1,10 +1,11 @@
-Project 1: System Call Implementation for xv6
+# Project 1: System Call Implementation for xv6
 =============================================
+## Overview
 1. Understand the full system call path from user space to kernel space.
 2. Practice safe kernel programming with proper locking and memory isolation.
 3. Build confidence navigating and modifying a real operating system codebase.
 
-Required Features
+## Required Features
 -----------------
 1) `getprocs` system call
    - Signature:
