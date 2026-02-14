@@ -30,9 +30,10 @@ state_name(int state)
 }
 
 /* Without changing printf.c, random charactization from output appears
- * I decided to make a print functions to help address the problem.
+ * I decided to make a print helper functions to help address the problem
  */
 
+//Counts the number of digits a positive number has
 static int
 uint_digits(uint64 value)
 {
@@ -45,6 +46,7 @@ uint_digits(uint64 value)
   return digits;
 }
 
+//prints out spacing
 static void
 print_padding(int count)
 {
@@ -53,6 +55,7 @@ print_padding(int count)
   }
 }
 
+//prints out an unsigned value, then adds spaces so total width is based on 'width'
 static void
 print_uint_padded(uint64 value, int width)
 {
@@ -64,6 +67,7 @@ print_uint_padded(uint64 value, int width)
   }
 }
 
+//prints int value, then fill spaces with fixed width
 static void
 print_int_padded(int value, int width)
 {
@@ -76,6 +80,7 @@ print_int_padded(int value, int width)
   }
 }
 
+//prints string, filling spaces of fixed width
 static void
 print_str_padded(const char *value, int width)
 {
@@ -92,8 +97,6 @@ print_str_padded(const char *value, int width)
     print_padding(width - length);
   }
 }
-
-
 
 int main(void) {
 
@@ -124,13 +127,3 @@ int main(void) {
   exit(0);
 
 }
-
-
-/*
-
-Without the functions, formatting print out like this:
-
-PID    PPID   STATE      SIZE       NAME
-%-6d %-6d %-10s %-10u q�����������V�Z�^�b�f�j���
-
-*/
