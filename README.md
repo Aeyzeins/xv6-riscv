@@ -1,5 +1,6 @@
 # Project 1: System Call Implementation for xv6
-=============================================
+
+
 ## Overview
 1. Understand the full system call path from user space to kernel space.
 2. Practice safe kernel programming with proper locking and memory isolation.
