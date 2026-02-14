@@ -94,23 +94,20 @@ Flow aligned with current `kernel/sysproc.c`:
 ```
 2. Reject invalid limits early:
 ```text
-   - if `max <= 0`, return -1
-'''
+  if max <= 0, return -1
+```
 3. Keep a kernel-local temporary record:
    - `struct procinfo info;`
 4. For each non-`UNUSED` process selected for export:
    - Fill `info` from kernel `struct proc` fields
    - Compute the destination user address by offsetting from `uaddr`:
-
+```text
          uaddr + count * sizeof(info)
-
+```
    - Copy one record out with:
-
-         copyout(curproc->pagetable,
-                 uaddr + count * sizeof(info),
-                 (char *)&info,
-                 sizeof(info))
-
+```text
+         copyout(curproc->pagetable, uaddr + count * sizeof(info), (char *)&info, sizeof(info))
+```
 5. If `copyout(...) < 0` at any point, return `-1`.
 6. On success, return `count` (actual records copied).
 
