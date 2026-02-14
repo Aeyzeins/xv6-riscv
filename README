@@ -1,48 +1,61 @@
-xv6 is a re-implementation of Dennis Ritchie's and Ken Thompson's Unix
-Version 6 (v6).  xv6 loosely follows the structure and style of v6,
-but is implemented for a modern RISC-V multiprocessor using ANSI C.
+Project 1: System Call Implementation for xv6
+=============================================
+1. Understand the full system call path from user space to kernel space.
+2. Practice safe kernel programming with proper locking and memory isolation.
+3. Build confidence navigating and modifying a real operating system codebase.
 
-ACKNOWLEDGMENTS
+Required Features
+-----------------
+1) `getprocs` system call
+   - Signature:
 
-xv6 is inspired by John Lions's Commentary on UNIX 6th Edition (Peer
-to Peer Communications; ISBN: 1-57398-013-7; 1st edition (June 14,
-2000)).  See also https://pdos.csail.mit.edu/6.1810/, which provides
-pointers to on-line resources for v6.
+         int getprocs(struct procinfo *pinfo, int max_procs)
 
-The following people have made contributions: Russ Cox (context switching,
-locking), Cliff Frey (MP), Xiao Yu (MP), Nickolai Zeldovich, and Austin
-Clements.
+   - Parameters:
+     - `pinfo`: user pointer to an array of `struct procinfo`
+     - `max_procs`: maximum entries to populate
 
-We are also grateful for the bug reports and patches contributed by
-Abhinavpatel00, Takahiro Aoyagi, Marcelo Arroyo, Hirbod Behnam, Silas
-Boyd-Wickizer, Anton Burtsev, carlclone, Ian Chen, clivezeng, Dan
-Cross, Cody Cutler, Mike CAT, Tej Chajed, Asami Doi,Wenyang Duan,
-echtwerner, eyalz800, Nelson Elhage, Saar Ettinger, Alice Ferrazzi,
-Nathaniel Filardo, flespark, Peter Froehlich, Yakir Goaron, Shivam
-Handa, Matt Harvey, Bryan Henry, jaichenhengjie, Jim Huang, Matúš
-Jókay, John Jolly, Alexander Kapshuk, Anders Kaseorg, kehao95,
-Wolfgang Keller, Jungwoo Kim, Jonathan Kimmitt, Eddie Kohler, Vadim
-Kolontsov, Austin Liew, l0stman, Pavan Maddamsetti, Imbar Marinescu,
-Yandong Mao, Matan Shabtay, Hitoshi Mitake, Carmi Merimovich,
-mes900903, Mark Morrissey, mtasm, Joel Nider, Hayato Ohhashi,
-OptimisticSide, papparapa, phosphagos, Harry Porter, Greg Price, Zheng
-qhuo, Quancheng, RayAndrew, Jude Rich, segfault, Ayan Shafqat, Eldar
-Sehayek, Yongming Shen, Fumiya Shigemitsu, snoire, Taojie, Cam Tenny,
-tyfkda, Warren Toomey, Stephen Tu, Alissa Tung, Rafael Ubal, unicornx,
-Amane Uehara, Pablo Ventura, Luc Videau, Xi Wang, WaheedHafez, Keiichi
-Watanabe, Lucas Wolf, Nicolas Wolovick, wxdao, Grant Wu, x653, Andy
-Zhang, Jindong Zhang, Icenowy Zheng, ZhUyU1997, and Zou Chang Wei.
+   - Return values:
+     - On success: number of entries written
+     - On failure: `-1`
+       - invalid user pointer
+       - invalid `max_procs` (e.g., <= 0)
 
-ERROR REPORTS
+2) Shared process structure
+   Define this in a header shared by kernel and user space:
 
-Please send errors and suggestions to Frans Kaashoek and Robert Morris
-(kaashoek,rtm@mit.edu).  The main purpose of xv6 is as a teaching
-operating system for MIT's 6.1810, so we are more interested in
-simplifications and clarifications than new features.
+    struct procinfo {
+        int pid;           // Process ID
+        int ppid;          // Parent process ID
+        int state;         // Numeric process state
+        uint sz;           // Size of process memory (bytes)
+        char name[16];     // Process name
+    };
 
-BUILDING AND RUNNING XV6
+3) `ps` user utility
+   - Fetch process entries using `getprocs()`
+   - Print fixed-width table columns
+   - Convert state integers to readable labels:
+     - UNUSED
+     - EMBRYO
+     - SLEEPING
+     - RUNNABLE
+     - RUNNING
+     - ZOMBIE
 
-You will need a RISC-V "newlib" tool chain from
-https://github.com/riscv/riscv-gnu-toolchain, and qemu compiled for
-riscv64-softmmu.  Once they are installed, and in your shell
-search path, you can run "make qemu".
+   Required output shape:
+
+    PID    PPID   STATE      SIZE       NAME
+    1      0      SLEEPING   12288      init
+    2      1      SLEEPING   16384      sh
+    3      2      RUNNING    8192       ps
+
+Implementation Checklist
+------------------------
+- Register a new syscall number.
+- Add user-space syscall interface/stub for `getprocs`.
+- Add kernel syscall dispatcher entry.
+- Implement `sys_getprocs` argument validation.
+- Implement safe traversal of the process table in kernel code.
+- Copy each `procinfo` entry to user memory with `copyout()`.
+- Add `ps.c` and include it in the build system.
