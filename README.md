@@ -63,3 +63,66 @@ PID    PPID   STATE      SIZE       NAME
 - Implement safe traversal of the process table in kernel code.
 - Copy each `procinfo` entry to user memory with `copyout()`.
 - Add `ps.c` and include it in the build system.
+
+## Locking Strategy and Synchronization Approach
+--------------------------------------------
+🔒 Accessing the process table must be synchronized.
+
+### Recommended approach:
+1. Acquire the process table lock before iterating processes.
+2. Read process metadata while holding the lock.
+3. Build a temporary kernel-side `struct procinfo` entry.
+4. Use `copyout()` to move data into the user buffer.
+5. Release the lock once iteration is complete.
+
+### Notes:
+- Never walk process table entries without the required lock.
+- Keep lock hold time reasonable; avoid unnecessary work under lock.
+- Ensure parent PID access is done safely when parent pointer can be null.
+
+
+## Memory Management and `copyout` Logic
+-------------------------------------
+💾 Kernel code must not directly dereference user pointers.
+
+Safe flow:
+1. Validate `max_procs` first (`max_procs > 0`).
+2. Validate pointer argument extraction in syscall handler.
+3. For each process entry to export:
+   - Fill a local kernel `struct procinfo kpi`.
+   - Compute destination user virtual address:
+
+         dst = user_pinfo + index * sizeof(struct procinfo)
+
+   - Call `copyout(pagetable, dst, (char *)&kpi, sizeof(kpi))`.
+4. If any `copyout` fails, return `-1`.
+
+Additional safety notes:
+- Bound writes by `max_procs`.
+- Avoid integer overflow in address arithmetic.
+- Return exact number successfully copied when complete.
+
+
+## Testing Approach and Test Cases
+-------------------------------
+🧪 Test both functionality and failure handling.
+
+A) Functional tests
+1. Boot xv6 and run `ps`.
+2. Confirm header and fixed-width formatting.
+3. Confirm known processes appear (`init`, `sh`, `ps`).
+4. Confirm state mapping text is correct.
+
+B) Boundary tests
+1. `max_procs = 1` returns a single row.
+2. `max_procs` smaller than total processes truncates output safely.
+3. `max_procs` larger than total returns only actual count.
+
+C) Error-path tests
+1. Invalid user pointer returns `-1`.
+2. `max_procs <= 0` returns `-1`.
+3. Ensure no kernel panic on bad arguments.
+
+D) Concurrency sanity
+1. Spawn/exit processes while repeatedly calling `ps`.
+2. Verify stable behavior (no panics, no obvious corruption).
