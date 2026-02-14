@@ -47,12 +47,14 @@
 
    Required output shape:
 
-    PID    PPID   STATE      SIZE       NAME
-    1      0      SLEEPING   12288      init
-    2      1      SLEEPING   16384      sh
-    3      2      RUNNING    8192       ps
+```text
+PID    PPID   STATE      SIZE       NAME
+1      0      SLEEPING   12288      init
+2      1      SLEEPING   16384      sh
+3      2      RUNNING    8192       ps
+```
 
-Implementation Checklist
+## Implementation Checklist
 ------------------------
 - Register a new syscall number.
 - Add user-space syscall interface/stub for `getprocs`.
