@@ -83,24 +83,41 @@ PID    PPID   STATE      SIZE       NAME
 
 ## Memory Management and `copyout` Logic
 -------------------------------------
-💾 Kernel code must not directly dereference user pointers.
+💾 In `sys_getprocs`, treat user pointers as virtual addresses only.
+Do not dereference them directly in kernel code.
 
-Safe flow:
-1. Validate `max_procs` first (`max_procs > 0`).
-2. Validate pointer argument extraction in syscall handler.
-3. For each process entry to export:
-   - Fill a local kernel `struct procinfo kpi`.
-   - Compute destination user virtual address:
+Flow aligned with current `kernel/sysproc.c`:
+1. Read syscall args with xv6 helpers:
+```text
+  argaddr(0, &uaddr);     //for user buffer base address
+  argint(1, &max);        // for entry limit
+```
+2. Reject invalid limits early:
+```text
+   - if `max <= 0`, return -1
+'''
+3. Keep a kernel-local temporary record:
+   - `struct procinfo info;`
+4. For each non-`UNUSED` process selected for export:
+   - Fill `info` from kernel `struct proc` fields
+   - Compute the destination user address by offsetting from `uaddr`:
 
-         dst = user_pinfo + index * sizeof(struct procinfo)
+         uaddr + count * sizeof(info)
 
-   - Call `copyout(pagetable, dst, (char *)&kpi, sizeof(kpi))`.
-4. If any `copyout` fails, return `-1`.
+   - Copy one record out with:
+
+         copyout(curproc->pagetable,
+                 uaddr + count * sizeof(info),
+                 (char *)&info,
+                 sizeof(info))
+
+5. If `copyout(...) < 0` at any point, return `-1`.
+6. On success, return `count` (actual records copied).
 
 Additional safety notes:
-- Bound writes by `max_procs`.
-- Avoid integer overflow in address arithmetic.
-- Return exact number successfully copied when complete.
+- Bound writes with `count < max`.
+- Use kernel-local `info` as the source for `copyout`.
+- Return the exact number of successfully copied entries.
 
 
 ## Testing Approach and Test Cases

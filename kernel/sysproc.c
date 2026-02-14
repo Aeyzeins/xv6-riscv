@@ -122,7 +122,7 @@ sys_getcourseno(void)
 uint64
 sys_getprocs(void)
 {
-  uint64 uaddr;                       //user address off buffer where kernsel should write
+  uint64 uaddr;                       //user address off buffer where kernel should write
   int max;                            //max number of entries that the user wants the kernel to fill
   struct proc *p;                     //pointer loop for kernel process table   
   struct procinfo info;               //temp kernel-side struct that holds one process’s info before copying it out to user space   
