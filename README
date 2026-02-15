@@ -2,6 +2,16 @@
 
 
 ## Overview
+--------
+In this project, we are extending xv6 by adding a new system call:
+
+    int getprocs(struct procinfo *pinfo, int max_procs)
+
+This system call returns information about currently active processes, and a new
+user-space program `ps` will display that information in a formatted table.
+
+## Learning Objectives
+-------------------
 1. Understand the full system call path from user space to kernel space.
 2. Practice safe kernel programming with proper locking and memory isolation.
 3. Build confidence navigating and modifying a real operating system codebase.
@@ -47,12 +57,11 @@
 
    Required output shape:
 
-```text
 PID    PPID   STATE      SIZE       NAME
 1      0      SLEEPING   12288      init
 2      1      SLEEPING   16384      sh
 3      2      RUNNING    8192       ps
-```
+
 
 ## Implementation Checklist
 ------------------------
@@ -64,11 +73,11 @@ PID    PPID   STATE      SIZE       NAME
 - Copy each `procinfo` entry to user memory with `copyout()`.
 - Add `ps.c` and include it in the build system.
 
-## Locking Strategy and Synchronization Approach
+## 🔒 Locking Strategy and Synchronization Approach
 --------------------------------------------
-🔒 Accessing the process table must be synchronized.
+Accessing the process table must be synchronized.
 
-### Recommended approach:
+### Approach:
 1. Acquire the process table lock before iterating processes.
 2. Read process metadata while holding the lock.
 3. Build a temporary kernel-side `struct procinfo` entry.
@@ -77,37 +86,37 @@ PID    PPID   STATE      SIZE       NAME
 
 ### Notes:
 - Never walk process table entries without the required lock.
-- Keep lock hold time reasonable; avoid unnecessary work under lock.
+- Keep lock hold time reasonable; this is to avoid unnecessary work under lock.
 - Ensure parent PID access is done safely when parent pointer can be null.
 
 
-## Memory Management and `copyout` Logic
+## 💾 Memory Management and `copyout` Logic
 -------------------------------------
-💾 In `sys_getprocs`, treat user pointers as virtual addresses only.
+In `sys_getprocs`, treat user pointers as virtual addresses only.
 Do not dereference them directly in kernel code.
 
 Flow aligned with current `kernel/sysproc.c`:
 1. Read syscall args with xv6 helpers:
-```text
+
   argaddr(0, &uaddr);     //for user buffer base address
   argint(1, &max);        // for entry limit
-```
-2. Reject invalid limits early:
-```text
+
+2. Reject invalid limits early if its zero or less:
+
   if max <= 0, return -1
-```
+
 3. Keep a kernel-local temporary record:
    - `struct procinfo info;`
 4. For each non-`UNUSED` process selected for export:
    - Fill `info` from kernel `struct proc` fields
    - Compute the destination user address by offsetting from `uaddr`:
-```text
+
          uaddr + count * sizeof(info)
-```
+
    - Copy one record out with:
-```text
+
          copyout(curproc->pagetable, uaddr + count * sizeof(info), (char *)&info, sizeof(info))
-```
+
 5. If `copyout(...) < 0` at any point, return `-1`.
 6. On success, return `count` (actual records copied).
 
@@ -120,6 +129,10 @@ Additional safety notes:
 ## Testing Approach and Test Cases
 -------------------------------
 🧪 Test both functionality and failure handling.
+
+I created several files to handle test functionality and failure handling for B) and C)
+-   After executing make qemu
+-   run the command getprocs_tests
 
 A) Functional tests
 1. Boot xv6 and run `ps`.
@@ -138,5 +151,20 @@ C) Error-path tests
 3. Ensure no kernel panic on bad arguments.
 
 D) Concurrency sanity
+
 1. Spawn/exit processes while repeatedly calling `ps`.
-2. Verify stable behavior (no panics, no obvious corruption).
+2. Verify stable behavior (no panics, no obvious corruption). The pid of ps should be able to change
+whenever we execute a command.
+
+## Usage Instructions
+------------------
+📚 Build and run:
+1. Rebuild xv6 with syscall and user program changes.
+2. Launch xv6 (e.g., via `make qemu`).
+3. At shell prompt, run:
+
+       ps
+
+Expected output:
+- A table with PID, PPID, STATE, SIZE, NAME.
+- States shown as readable strings, not raw integers.

@@ -147,6 +147,7 @@ UPROGS=\
 	$U/_dorphan\
 	$U/_getcourseno\
 	$U/_ps\
+	$U/_getprocs_tests\
 
 fs.img: mkfs/mkfs README $(UPROGS)
 	mkfs/mkfs fs.img README $(UPROGS)
