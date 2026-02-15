@@ -163,7 +163,7 @@ whenever we execute a command.
 2. Launch xv6 (e.g., via `make qemu`).
 3. At shell prompt, run:
 
-       ps
+  ps
 
 Expected output:
 - A table with PID, PPID, STATE, SIZE, NAME.
