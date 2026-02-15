@@ -16,6 +16,10 @@ Defining state cases, numeric values into readable words
 
 static const char*  //returns pointer to a string literal (read-only)
 
+/*
+ * 
+ */
+
 state_name(int state)
 {
   switch(state){

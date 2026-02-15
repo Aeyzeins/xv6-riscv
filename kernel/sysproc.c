@@ -119,6 +119,7 @@ sys_getcourseno(void)
 
 //Project 1:
 //sys_getprocs: copy process info into user-defined array
+//
 uint64
 sys_getprocs(void)
 {
@@ -143,9 +144,11 @@ sys_getprocs(void)
   for(p = proc; p < &proc[NPROC] && count < max; p++) {
     int has_entry = 0; //flag to indicate if we added an entry for this process
 
-    //Lock the process to safely read its state, pid, ppid, sz, and name from procinfo.c
-    acquire(&wait_lock);
-    acquire(&p->lock);
+    //Lock the process to safely read its state, pid, ppid, sz, and name from procinfo.h
+    //Concurrency (proc.h)
+    //Making sure the CPU or thread doesnt overlap while reading it.
+    acquire(&wait_lock);      // prevents concurrent parent-pointer updates
+    acquire(&p->lock);        //protects each process’s own fields in procinfo.h
 
     //We will have it copy only the real processes, not the UNUSED ones.
     if (p->state != UNUSED) {
@@ -155,10 +158,10 @@ sys_getprocs(void)
       info.sz = p->sz;                 //Size of process memory in bytes
 
       /*
-      copies the process name from the kernel’s proc struct 
-      into the temporary procinfo struct so it can later be 
-      copied out to user space.
-      */
+       * For name I use memmove so that it safely copies exactly the fixed
+       * 160byte process name from kernel memory into the output struct, so the
+       * name field is filled correctly before sending it to user space.
+       */
       memmove(info.name, p->name, sizeof(info.name)); 
       has_entry = 1; //Set flag to indicate we have an entry to copy
     }
@@ -176,8 +179,6 @@ sys_getprocs(void)
       count++;  //increment count of the next entry.
     }
 
-
-  
   }
 
   return count; //return the number of process entries copied into user space
